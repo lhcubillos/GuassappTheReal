@@ -155,11 +155,15 @@ namespace GuassappTheReal
 		public const string Yo = "56983362592";
 		private const string token = "UAGIw55wqzjwzLKLuVVHvwtt";
 
+		public User user;
+		public string name;
 		public string phone_number;
 		public IPAddress IP;
 		public string port;
 		public Socket cliente;
 		int i = 0;
+		Thread threadServidor;
+		Thread threadCliente;
 
 		//Tengo que definir las coords cuando llame este controlador.
 		CLLocationCoordinate2D coords;
@@ -172,15 +176,32 @@ namespace GuassappTheReal
 			
 		}
 
+		public override void ViewWillAppear (bool animated)
+		{
+			base.ViewWillAppear (animated);
+			Console.WriteLine ("hola");
+			threadServidor = new Thread (SimularServidor);
+			threadServidor.IsBackground = true;
+			threadServidor.Start ();
+			ObtenerCoordenadas ();
+
+		}
+		public override void ViewWillDisappear (bool animated)
+		{
+			base.ViewWillDisappear (animated);
+			Console.WriteLine ("chao");
+			if (threadCliente != null)
+				threadCliente.Abort ();
+			threadServidor.Abort ();
+		}
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			Title = phone_number;
-			var thread = new Thread (SimularServidor);
-			thread.IsBackground = true;
-			thread.Start ();
-			ObtenerCoordenadas ();
-			var annotation = new BasicMapAnnotation (coords, phone_number, "");
+			name = (user.name != null) ? user.name : user.phone_number;
+			phone_number = user.phone_number;
+			Title = name;
+
+			var annotation = new BasicMapAnnotation (coords, name , null);
 
 			CambioCoordenadas += UbicacionViewController_CambioCoordenadas;
 			mapView = new MKMapView (View.Bounds);
@@ -208,10 +229,10 @@ namespace GuassappTheReal
 			i++;
 			InvokeOnMainThread ( () => {
 				// manipulate UI controls
-				mapView.AddAnnotation(new BasicMapAnnotation(newcoords,i.ToString(),"Iteracion"));
 				Console.WriteLine ("Ubicación cambió");
 				coords = newcoords;
 				mapView.Region = MKCoordinateRegion.FromDistance (coords, 2000, 2000);
+				mapView.AddAnnotation(new BasicMapAnnotation(newcoords, this.name,null));//i.ToString(),"Iteracion"));
 			});
 
 		}
@@ -247,9 +268,9 @@ namespace GuassappTheReal
 
 				//Ya tengo la IP y el Puerto, ahora creo un socket client para conectarme al server socket, e ir recibiendo la ubicacion.
 				if (meEstaCompartiendo){
-					var thread = new Thread(RecibirMensajesServidor);
-					thread.IsBackground = true;
-					thread.Start();
+					threadCliente = new Thread(RecibirMensajesServidor);
+					threadCliente.IsBackground = false;
+					threadCliente.Start();
 				}
 				sr.Close ();
 
@@ -272,11 +293,13 @@ namespace GuassappTheReal
 			var ep = new IPEndPoint (IP, int.Parse(port));
 			try{
 				cliente.Connect (ep);
+				Console.WriteLine("Conectado");
 				while (true) {
 					//Aquí tengo que recibir los mensajes con las ubicaciones.
 					byte[] dataBuffer = new byte[20000];
 					int largo = cliente.Receive (dataBuffer);
 					string coordenadas = Encoding.ASCII.GetString (dataBuffer, 0, largo);
+					Console.WriteLine(coordenadas);
 					//tengo que parsear las ubicaciones.
 					string[] Coordenadas = coordenadas.Split (new char[]{ ',' });
 					try {
@@ -299,7 +322,7 @@ namespace GuassappTheReal
 
 			var servidor = new Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			var clientes = new List<Socket> ();
-			IPEndPoint Ep = new IPEndPoint (IPAddress.Parse("192.168.1.34"), 8000);
+			IPEndPoint Ep = new IPEndPoint (IPAddress.Parse("192.168.0.101"), 8000);
 			servidor.Bind (Ep);
 			servidor.Listen (Int32.MaxValue);
 			var clm = new CLLocationManager ();
@@ -307,8 +330,8 @@ namespace GuassappTheReal
 			while (true) {
 				var cliente = servidor.Accept ();
 				clientes.Add (cliente);
-				var coords = clm.Location.Coordinate;
-				//var coords  = new CLLocationCoordinate2D(-33.5000469,-70.6133657);
+				//var coords = clm.Location.Coordinate;
+				var coords  = new CLLocationCoordinate2D(-33.5000469,-70.6133657);
 				string message = coords.Latitude.ToString () + "," + coords.Longitude.ToString ();
 				var data = Encoding.ASCII.GetBytes (message);
 				cliente.Send (data);

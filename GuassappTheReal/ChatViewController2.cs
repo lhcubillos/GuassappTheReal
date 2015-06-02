@@ -48,6 +48,7 @@ namespace GuassappTheReal
 		Socket servidor;
 		List<Socket> clientes;
 		List<User> numerosDeEsteGrupo;
+		Thread threadLocations;
 
 		public Grupo grupo;
 		MessagesBubbleImage outgoingBubbleImageData, incomingBubbleImageData;
@@ -223,9 +224,9 @@ namespace GuassappTheReal
 			IPEndPoint Ep = new IPEndPoint (ip, PUERTO);
 			servidor.Bind (Ep);
 			servidor.Listen (CONEXIONESMAXIMAS);
-			var thread = new Thread (RecibirConexiones);
-			thread.IsBackground = false;
-			thread.Start ();
+			threadLocations = new Thread (RecibirConexiones);
+			threadLocations.IsBackground = false;
+			threadLocations.Start ();
 
 		}
 
@@ -275,13 +276,22 @@ namespace GuassappTheReal
 			ScrollToBottom (true);
 			Console.WriteLine ("perro");
 		}
+
+		public void StopShareLocation(UIAlertAction obj){
+			if (threadLocations != null)
+				threadLocations.Abort ();
+		}
+
+
 		public override void PressedAccessoryButton (UIButton sender)
 		{
 			base.PressedAccessoryButton (sender);
 			var acc = new Action<UIAlertAction> (ShareLocation);
 			var acc2 = new Action<UIAlertAction> (RefreshMessages);
-			var alerta = UIAlertController.Create("", null,UIAlertControllerStyle.ActionSheet);
+			var acc3 = new Action<UIAlertAction> (StopShareLocation);
+			var alerta = UIAlertController.Create(null, null,UIAlertControllerStyle.ActionSheet);
 			alerta.AddAction(UIAlertAction.Create("Share Location", UIAlertActionStyle.Default, acc));
+			alerta.AddAction(UIAlertAction.Create("Stop Share Location", UIAlertActionStyle.Default, acc3));
 			alerta.AddAction(UIAlertAction.Create("Refresh Messages", UIAlertActionStyle.Default, acc2));
 			alerta.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
 			PresentViewController (alerta, true, null);

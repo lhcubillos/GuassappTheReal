@@ -73,6 +73,17 @@ namespace GuassappTheReal
 	//17:05: Me funciona mostrar una imagen, pero el problema es que se ve pésimo. No sé como editar la view que se muestra cuando 
 	//apreto el annotation.
 
+	//18:06: Para mostrar la imagen, esta tiene que ser de 32x32. Una página buena para convertirla es http://picresize.com/. Ya puedo
+	//mostrar la imagen, ahora quiero subirlo a github y despues corregir errores.
+
+	//2/06 11:37: Seria ideal poder arreglar lo de los sockets, para que funcione impecablemente.
+
+	//12:28: Los sockets funcionan perfecto, se apagan cuando salgo del mapa, y se prenden cuando entro. Lo que me falta por implementar es
+	//crear grupos, y mostrar los numeros que me llegan con los nombres de los contactos del teléfono. Eso lo puedo implementar para la proxima.
+
+	//13:00: En la view de Users para las ubicaciones, ahora puedo ver cuales tengo en el telefono, y los veo con el nombre que los tengo
+	//guardados. Ademas, la annotation la veo con ese nombre. Me falta crear grupos.
+
 	public partial class GuassappViewController : UIViewController
 	{
 		public const string Yo = "56983362592";
@@ -128,26 +139,7 @@ namespace GuassappTheReal
 			botonUsuarios.Clicked += BotonUsuarios_Clicked;
 			this.NavigationItem.LeftBarButtonItem = botonUsuarios;
 
-			////Mostrar contactos en telefono
-			//List<ABPerson> personas = new List<ABPerson> ();
-			//NSError err;
-			//var addressbook = ABAddressBook.Create (out err);
-			//if (ABAddressBook.GetAuthorizationStatus () != ABAuthorizationStatus.Authorized) {
-			//	addressbook.RequestAccess (delegate(bool granted, NSError error) {
-			//		//if (granted) {
-			//		personas = addressbook.GetPeople ().ToList ();
-			//		//}
-			//	});
-			//} else
-			//	personas = addressbook.GetPeople ().ToList ();
 
-			//List<string> Numeros = HacerRequestUsers ();
-			//
-			//List<ABPerson> Personas = new List<ABPerson> ();
-			//foreach (ABPerson persona in personas) {
-			//	if (Numeros.Contains (GetPrimerNumeroPersona(persona)))
-			//		Personas.Add (persona);
-			//}
 
 
 
@@ -358,36 +350,7 @@ namespace GuassappTheReal
 			base.ViewDidDisappear (animated);
 		}
 
-		//public List<string> HacerRequestUsers(){
-		//	string URL = "http://guasapuc.herokuapp.com/users.json";
-		//	string token = "UAGIw55wqzjwzLKLuVVHvwtt";
-		//	List<User2> Usuarios;
-		//	try 
-		//	{
-		//		var request = WebRequest.Create(URL) as HttpWebRequest;
-		//		request.Method = "GET";
-		//		request.ContentType = "application/json";
-		//		request.Headers.Add("Authorization", "Token token="+token);
-		//
-		//		HttpWebResponse Httpresponse = (HttpWebResponse)request.GetResponse();
-		//		StreamReader sr = new StreamReader (Httpresponse.GetResponseStream ());
-		//		string jsonRespuesta = sr.ReadToEnd ();
-		//		List<string> Numeros = new List<string>();
-		//		Usuarios = JsonConvert.DeserializeObject<List<User2>>(jsonRespuesta);
-		//		sr.Close ();
-		//		foreach(User2 u in Usuarios)
-		//			Numeros.Add(u.phone_number);
-		//		return Numeros;
-		//
-		//
-		//	}
-		//	catch(Exception e)
-		//	{
-		//		UIAlertView _error = new UIAlertView ("Error", e.Message, null, "Ok", null);
-		//		_error.Show ();
-		//	}
-		//	return null;
-		//}
+
 
 
 	}

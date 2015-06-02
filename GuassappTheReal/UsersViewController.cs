@@ -7,7 +7,7 @@ namespace GuassappTheReal
 {
 	public partial class UsersViewController : UIViewController
 	{
-		public string NumeroAPasar;
+		public User NumeroAPasar;
 		public UsersViewController (IntPtr handle) : base (handle)
 		{
 		}
@@ -22,7 +22,7 @@ namespace GuassappTheReal
 		public override void PrepareForSegue (UIStoryboardSegue segue, NSObject sender)
 		{
 			base.PrepareForSegue (segue, sender);
-			(segue.DestinationViewController as UbicacionViewController).phone_number = NumeroAPasar;
+			(segue.DestinationViewController as UbicacionViewController).user = NumeroAPasar;
 		}
 	}
 }
